@@ -230,6 +230,20 @@ body {
   animation: count-pop 0.3s var(--meridian-ease) both;
 }
 
+@keyframes typing-bounce {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+.typing-dot {
+  animation: typing-bounce 1.2s ease-in-out infinite;
+}
+
 @keyframes toast-in {
   from {
     transform: translateY(20px) scale(0.96);

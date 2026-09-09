@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Plus, MoreHorizontal, Check } from "lucide-react";
-import { PASTEL, Task, Status, STATUS_META, memberById } from "../data";
+import { Plus, MoreHorizontal, Check, AlarmClock, MoonStar } from "lucide-react";
+import { PASTEL, Task, Status, STATUS_META, memberById, taskHealth } from "../data";
 import { Tag, PriorityBadge, AvatarStack, SegmentedControl } from "./primitives";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 
@@ -11,13 +11,23 @@ function Card({ task, onOpen, onDragStart, dragging }: {
 }) {
   const done = task.subtasks.filter((s) => s.done).length;
   const total = task.subtasks.length;
+  const h = taskHealth(task);
+  const od = h.kind === "overdue";
   return (
     <div
       draggable
       onDragStart={onDragStart}
       onClick={onOpen}
       className={`bento-card bento-card-interactive cursor-pointer p-3.5 ${dragging ? "card-dragging" : ""}`}
+      style={od ? { borderColor: PASTEL.rose.border, boxShadow: "0 4px 20px -2px rgba(244,63,94,0.14)" } : undefined}
     >
+      {(od || h.stale) && (
+        <div className="mb-2 flex">
+          <span className="tnum inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-extrabold" style={{ background: od ? PASTEL.rose.bg : PASTEL.gold.bg, color: od ? PASTEL.rose.text : PASTEL.gold.text }}>
+            {od ? <><AlarmClock className="beacon h-3 w-3 rounded-full" strokeWidth={2.4} />{h.daysOverdue}d overdue</> : <><MoonStar className="h-3 w-3" strokeWidth={2.4} />No update {h.daysSinceUpdate}d</>}
+          </span>
+        </div>
+      )}
       <div className="flex items-center justify-between">
         <span className="tech-badge rounded-md bg-stone-100 px-1.5 py-0.5 text-[10px] text-stone-500">{task.code}</span>
         <PriorityBadge priority={task.priority} />

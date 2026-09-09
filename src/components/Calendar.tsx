@@ -167,12 +167,12 @@ export function Calendar() {
 
           <div className="space-y-8">
             {grouped.map(({ day, evs }) => (
-              <div key={day} className="grid grid-cols-[104px_minmax(0,1fr)] gap-4">
-                <div className="flex items-start gap-2">
-                  <span className="font-serif-italic text-[52px] leading-none text-stone-900 tnum">{String(day).padStart(2, "0")}</span>
-                  <span className="mt-2 rounded-md bg-stone-100 px-1.5 py-0.5 text-[11px] font-bold text-stone-500">{weekday[day]}</span>
+              <div key={day} className="grid grid-cols-[64px_minmax(0,1fr)] gap-4 sm:grid-cols-[84px_minmax(0,1fr)] sm:gap-6">
+                <div className="flex flex-col items-center">
+                  <span className="tech-badge text-[10px] text-stone-400">{weekday[day]}</span>
+                  <span className="font-serif-italic text-[44px] leading-none text-stone-900 tnum sm:text-[52px]">{String(day).padStart(2, "0")}</span>
                 </div>
-                <div className="space-y-3 border-t border-stone-100 pt-1">
+                <div className="min-w-0 space-y-3 border-t border-stone-100 pt-1">
                   {evs.length === 0 && (
                     <div className="flex items-center gap-2.5 rounded-2xl bg-stone-50 px-4 py-4 text-[13.5px] font-medium text-stone-400" style={{ border: "1px dashed rgba(0,0,0,0.08)" }}>
                       <CalIcon className="h-4 w-4" strokeWidth={2} />Focus Time — No meetings scheduled
@@ -244,31 +244,49 @@ export function Calendar() {
             {DELIVERABLES.map((d) => {
               const c = PASTEL[d.timeTint as PastelKey];
               return (
-                <div key={d.title} className="rounded-2xl bg-white/[0.04] p-4" style={{ border: "1px solid rgba(255,255,255,0.07)" }}>
-                  <div className="flex items-start justify-between">
-                    <span className="tnum text-[12px] font-bold" style={{ color: c.solid }}>Time: {d.time}</span>
-                    {d.badge ? (
-                      <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-bold text-white/80">{d.badge}</span>
-                    ) : (
-                      <ArrowUpRight className="h-4 w-4 text-white/40" strokeWidth={2} />
-                    )}
+                <div key={d.title} className="rounded-2xl bg-white/[0.04] p-4 transition-colors hover:bg-white/[0.07]" style={{ border: "1px solid rgba(255,255,255,0.07)" }}>
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="tnum flex items-center gap-1.5 text-[12px] font-bold" style={{ color: c.solid }}>
+                      <span className="h-2 w-2 rounded-full" style={{ background: c.solid }} />{d.time}
+                    </span>
+                    {d.badge
+                      ? <span className="shrink-0 rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-bold text-white/80">{d.badge}</span>
+                      : <ArrowUpRight className="h-4 w-4 shrink-0 text-white/40" strokeWidth={2} />}
                   </div>
-                  <h4 className="mt-1.5 text-[15px] font-bold tracking-tight">{d.title}</h4>
-                  <div className="mt-2.5 flex items-center justify-between">
-                    {d.people && (
-                      <div className="flex -space-x-1.5">
-                        {d.people.map((id) => { const m = memberById(id); return <span key={id} className="flex h-6 w-6 items-center justify-center rounded-full text-[9px] font-extrabold text-white ring-2 ring-[#111318]" style={{ background: PASTEL[m.tint].solid }}>{m.initials}</span>; })}
+
+                  <h4 className="mt-2 text-[15px] font-bold leading-snug tracking-tight">{d.title}</h4>
+
+                  {/* progress row */}
+                  {typeof d.progress === "number" && (
+                    <div className="mt-3">
+                      <div className="mb-1.5 flex items-center justify-between text-[11px] font-bold">
+                        <span className="text-white/50">Progress</span>
+                        <span className="tnum text-lime-400">{d.progress}%</span>
                       </div>
-                    )}
-                    {d.meta && <span className="text-[12px] font-medium text-white/50">{d.meta}</span>}
-                    {typeof d.progress === "number" && <span className="tnum text-[12.5px] font-extrabold text-lime-400">{d.progress}% complete</span>}
-                    {d.link && (
-                      <div className="flex w-full items-center justify-between">
-                        <span className="truncate text-[12px] font-medium text-white/50">{d.link}</span>
-                        <button className="tactile rounded-full bg-violet-500 px-3.5 py-1.5 text-[12px] font-extrabold text-white">Join Meeting</button>
+                      <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+                        <div className="h-full rounded-full bg-lime-400" style={{ width: `${d.progress}%` }} />
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
+
+                  {/* footer: people / meta, then link on its own row */}
+                  {(d.people || d.meta) && (
+                    <div className="mt-3 flex items-center justify-between gap-2 border-t border-white/[0.06] pt-3">
+                      {d.people && (
+                        <div className="flex -space-x-1.5">
+                          {d.people.map((id) => { const m = memberById(id); return <span key={id} className="flex h-6 w-6 items-center justify-center rounded-full text-[9px] font-extrabold text-white ring-2 ring-[#111318]" style={{ background: PASTEL[m.tint].solid }}>{m.initials}</span>; })}
+                        </div>
+                      )}
+                      {d.meta && <span className="text-[12px] font-medium text-white/50">{d.meta}</span>}
+                    </div>
+                  )}
+
+                  {d.link && (
+                    <div className="mt-3 flex items-center justify-between gap-2 border-t border-white/[0.06] pt-3">
+                      <span className="min-w-0 flex-1 truncate text-[12px] font-medium text-white/50">{d.link}</span>
+                      <button className="tactile shrink-0 rounded-full bg-violet-500 px-3.5 py-1.5 text-[12px] font-extrabold text-white hover:bg-violet-400">Join</button>
+                    </div>
+                  )}
                 </div>
               );
             })}

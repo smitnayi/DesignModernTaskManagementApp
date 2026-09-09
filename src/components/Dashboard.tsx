@@ -1,8 +1,31 @@
 import { useState } from "react";
-import { ArrowUpRight, TrendingUp, Check, Rocket, Target } from "lucide-react";
-import { PASTEL, PastelKey, Task, Status, memberById } from "../data";
+import { ArrowUpRight, TrendingUp, Check, Rocket, Target, AlarmClock, MoonStar } from "lucide-react";
+import { PASTEL, PastelKey, Task, Status, memberById, taskHealth } from "../data";
 import { Tag, PriorityBadge, AvatarStack, ProgressBar, SegmentedControl } from "./primitives";
 import { MetricBars } from "./MetricBars";
+import { AttentionCenter } from "./AttentionCenter";
+
+function HealthChip({ task }: { task: Task }) {
+  const h = taskHealth(task);
+  if (h.kind === "overdue") {
+    return (
+      <span className="tnum inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-extrabold" style={{ background: PASTEL.rose.bg, color: PASTEL.rose.text }}>
+        <AlarmClock className="beacon h-3 w-3 rounded-full" strokeWidth={2.4} />{h.daysOverdue}d overdue
+      </span>
+    );
+  }
+  if (h.stale) {
+    return (
+      <span className="tnum inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-extrabold" style={{ background: PASTEL.gold.bg, color: PASTEL.gold.text }}>
+        <MoonStar className="h-3 w-3" strokeWidth={2.4} />quiet {h.daysSinceUpdate}d
+      </span>
+    );
+  }
+  if (h.kind === "due-today" || h.kind === "due-soon") {
+    return <span className="tnum rounded-full px-1.5 py-0.5 text-[10px] font-extrabold" style={{ background: PASTEL[h.tint].bg, color: PASTEL[h.tint].text }}>{h.dueLabel}</span>;
+  }
+  return null;
+}
 
 const KPIS: { label: string; value: string; delta: string; tint: PastelKey; icon: any; spark: number[] }[] = [
   { label: "Total Tasks", value: "137", delta: "+20%", tint: "lavender", icon: TrendingUp, spark: [30, 45, 38, 60, 52, 74, 68] },
@@ -40,10 +63,14 @@ function Dial({ value, tint }: { value: number; tint: PastelKey }) {
   );
 }
 
-export function Dashboard({ tasks, onOpenTask, onToggleSub }: {
+export function Dashboard({ tasks, onOpenTask, onToggleSub, onReschedule, onMarkDone, onCaughtUp, onNudge }: {
   tasks: Task[];
   onOpenTask: (t: Task) => void;
   onToggleSub: (taskId: string, subId: string) => void;
+  onReschedule: (id: string, days: number) => void;
+  onMarkDone: (id: string) => void;
+  onCaughtUp: (id: string) => void;
+  onNudge: (id: string) => void;
 }) {
   const [queueFilter, setQueueFilter] = useState<Status | "all">("todo");
   const lineup = tasks.filter((t) => t.status === "in_progress");
@@ -64,6 +91,16 @@ export function Dashboard({ tasks, onOpenTask, onToggleSub }: {
           Here's what's moving across your workspace today — Sprint 24 is 74% complete.
         </p>
       </div>
+
+      {/* Attention / triage center */}
+      <AttentionCenter
+        tasks={tasks}
+        onOpenTask={onOpenTask}
+        onReschedule={onReschedule}
+        onMarkDone={onMarkDone}
+        onCaughtUp={onCaughtUp}
+        onNudge={onNudge}
+      />
 
       {/* KPI bento row */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -112,7 +149,8 @@ export function Dashboard({ tasks, onOpenTask, onToggleSub }: {
                 <button key={t.id} onClick={() => onOpenTask(t)} className="tactile group block w-full text-left">
                   <div className="mb-1.5 flex items-center gap-2">
                     <span className="tech-badge rounded-md bg-stone-100 px-1.5 py-0.5 text-[10px] text-stone-500">{t.code}</span>
-                    <span className="flex-1 truncate text-[14px] font-bold text-stone-900 group-hover:text-violet-700">{t.title}</span>
+                    <span className="min-w-0 flex-1 truncate text-[14px] font-bold text-stone-900 group-hover:text-violet-700">{t.title}</span>
+                    <HealthChip task={t} />
                     <span className="tnum text-[13px] font-extrabold text-stone-900">{pct}%</span>
                   </div>
                   <div className="flex items-center gap-3">
@@ -144,9 +182,10 @@ export function Dashboard({ tasks, onOpenTask, onToggleSub }: {
             {myWork.slice(0, 4).map((t) => (
               <div key={t.id} className="rounded-2xl bg-stone-50 p-3.5" style={{ border: "1px solid rgba(0,0,0,0.04)" }}>
                 <div className="flex items-center justify-between gap-2">
-                  <button onClick={() => onOpenTask(t)} className="tactile flex-1 truncate text-left text-[13.5px] font-bold text-stone-900 hover:text-violet-700">
+                  <button onClick={() => onOpenTask(t)} className="tactile min-w-0 flex-1 truncate text-left text-[13.5px] font-bold text-stone-900 hover:text-violet-700">
                     {t.title}
                   </button>
+                  <HealthChip task={t} />
                   <PriorityBadge priority={t.priority} />
                 </div>
                 <div className="mt-2.5 space-y-1.5">

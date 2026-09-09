@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { X, Link2, Check, Plus, Clock, Calendar, Play, Pause } from "lucide-react";
-import { PASTEL, Task, Status, STATUS_META, memberById } from "../data";
+import { X, Link2, Check, Plus, Clock, Calendar, Play, Pause, AlarmClock, MoonStar } from "lucide-react";
+import { PASTEL, Task, Status, STATUS_META, memberById, taskHealth } from "../data";
 import { Avatar, PriorityBadge, ProgressBar } from "./primitives";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 
@@ -30,6 +30,7 @@ export function TaskDrawer({ task, onClose, onToggleSub, onStatus, onAddSub }: {
   }, [onClose]);
 
   if (!task) return null;
+  const health = taskHealth(task);
   const done = task.subtasks.filter((s) => s.done).length;
   const pct = task.subtasks.length ? Math.round((done / task.subtasks.length) * 100) : 0;
   const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
@@ -84,6 +85,19 @@ export function TaskDrawer({ task, onClose, onToggleSub, onStatus, onAddSub }: {
             })}
           </div>
 
+          {(health.kind === "overdue" || health.stale) && (
+            <div className="mt-4 flex items-center gap-2.5 rounded-2xl px-3.5 py-3" style={{ background: health.kind === "overdue" ? PASTEL.rose.bg : PASTEL.gold.bg, border: `1px solid ${health.kind === "overdue" ? PASTEL.rose.border : PASTEL.gold.border}` }}>
+              {health.kind === "overdue"
+                ? <AlarmClock className="beacon h-5 w-5 shrink-0 rounded-full" style={{ color: PASTEL.rose.text }} strokeWidth={2.2} />
+                : <MoonStar className="h-5 w-5 shrink-0" style={{ color: PASTEL.gold.text }} strokeWidth={2.2} />}
+              <p className="text-[12.5px] font-bold" style={{ color: health.kind === "overdue" ? PASTEL.rose.text : PASTEL.gold.text }}>
+                {health.kind === "overdue"
+                  ? `This task is ${health.daysOverdue} day${health.daysOverdue > 1 ? "s" : ""} overdue.`
+                  : `No update in ${health.daysSinceUpdate} days — is this still moving?`}
+              </p>
+            </div>
+          )}
+
           <h1 className="mt-5 text-[24px] font-extrabold leading-tight tracking-tight text-stone-900">{task.title}</h1>
           <p className="mt-2 text-[14px] leading-relaxed text-stone-600">{task.description}</p>
 
@@ -97,7 +111,9 @@ export function TaskDrawer({ task, onClose, onToggleSub, onStatus, onAddSub }: {
           <div className="mt-5 grid grid-cols-2 gap-3">
             <MetaBox label="Priority"><PriorityBadge priority={task.priority} /></MetaBox>
             <MetaBox label="Due date">
-              <span className="flex items-center gap-1.5 text-[13px] font-bold text-stone-900"><Calendar className="h-3.5 w-3.5 text-stone-400" strokeWidth={2} />{task.due}</span>
+              <span className="flex items-center gap-1.5 text-[13px] font-bold" style={{ color: health.kind === "overdue" ? PASTEL.rose.text : "#1c1917" }}>
+                <Calendar className="h-3.5 w-3.5" style={{ color: health.kind === "overdue" ? PASTEL.rose.text : "#a8a29e" }} strokeWidth={2} />{health.dueLabel}
+              </span>
             </MetaBox>
             <MetaBox label="Assignees">
               <div className="flex -space-x-1.5">
