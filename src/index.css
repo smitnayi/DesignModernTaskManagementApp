@@ -1,0 +1,268 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Urbanist:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import 'tailwindcss';
+
+/* ============================================================
+   MERIDIAN CLARITY PRO — KINETIC 2.0 DESIGN SYSTEM
+   ============================================================ */
+
+@theme {
+  --font-sans: 'Urbanist', 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-serif: 'Instrument Serif', Georgia, serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --color-canvas: #faf8f5;
+  --color-canvas-subtle: #f4f0e6;
+  --color-canvas-warm: #f8f6f0;
+  --color-surface: #ffffff;
+  --color-obsidian: #111318;
+
+  --color-stone-950: #0c0a09;
+  --color-stone-900: #1c1917;
+  --color-stone-700: #44403c;
+  --color-stone-600: #57534e;
+  --color-stone-500: #78716c;
+  --color-stone-400: #a8a29e;
+
+  --ease-kinetic: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root {
+  --meridian-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: var(--color-canvas);
+  color: #1c1917;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ---- Typography helpers ---- */
+.font-serif-italic {
+  font-family: var(--font-serif);
+  font-style: italic;
+  letter-spacing: -0.02em;
+}
+.tnum {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: 'tnum', 'lnum';
+}
+.tech-badge {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+
+/* ---- Elevation / surfaces ---- */
+.bento-card {
+  background: #ffffff;
+  border-radius: 24px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 4px 20px -2px rgba(18, 19, 22, 0.03),
+    0 2px 6px -1px rgba(18, 19, 22, 0.02);
+  transition: transform 0.22s var(--meridian-ease), box-shadow 0.22s var(--meridian-ease);
+}
+.bento-card-interactive:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 16px 34px -6px rgba(18, 19, 22, 0.09),
+    0 4px 12px -2px rgba(18, 19, 22, 0.045);
+}
+.dynamic-island {
+  background: #111318;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 20px 40px -8px rgba(0, 0, 0, 0.45),
+    0 4px 12px rgba(0, 0, 0, 0.2);
+}
+.glass-card {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+}
+.card-dragging {
+  transform: scale(0.97) rotate(1.2deg);
+  box-shadow: 0 24px 48px -12px rgba(18, 19, 22, 0.25) !important;
+  opacity: 0.92;
+}
+
+/* ---- Tactile pressables ---- */
+.tactile {
+  transition: transform 0.15s var(--meridian-ease), box-shadow 0.15s var(--meridian-ease),
+    background-color 0.15s var(--meridian-ease);
+}
+.tactile:active {
+  transform: scale(0.97);
+}
+
+/* ---- Striped kinetic progress ---- */
+.striped-bar-green {
+  background: repeating-linear-gradient(-45deg, #a3e635, #a3e635 6px, #84cc16 6px, #84cc16 12px);
+}
+.striped-bar-orange {
+  background: repeating-linear-gradient(-45deg, #fb923c, #fb923c 6px, #f97316 6px, #f97316 12px);
+}
+.striped-bar-purple {
+  background: repeating-linear-gradient(-45deg, #c084fc, #c084fc 6px, #a855f7 6px, #a855f7 12px);
+}
+.striped-bar-sky {
+  background: repeating-linear-gradient(-45deg, #38bdf8, #38bdf8 6px, #0ea5e9 6px, #0ea5e9 12px);
+}
+.striped-anim {
+  background-size: 200% 100%;
+  animation: stripe-flow 18s linear infinite;
+}
+@keyframes stripe-flow {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* ---- Beacons / motion ---- */
+@keyframes beacon-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(132, 204, 22, 0.55);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(132, 204, 22, 0);
+  }
+}
+.beacon {
+  animation: beacon-pulse 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes bar-grow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+.bar-grow {
+  transform-origin: bottom;
+  animation: bar-grow 0.6s var(--meridian-ease) both;
+}
+@keyframes drawer-in {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+.drawer-in {
+  animation: drawer-in 0.38s var(--meridian-ease) both;
+}
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.overlay-in {
+  animation: overlay-in 0.28s var(--meridian-ease) both;
+}
+@keyframes palette-in {
+  from {
+    transform: translateY(-8px) scale(0.98);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+.palette-in {
+  animation: palette-in 0.28s var(--meridian-ease) both;
+}
+@keyframes rise-in {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+.rise-in {
+  animation: rise-in 0.5s var(--meridian-ease) both;
+}
+
+@keyframes donut-draw {
+  from {
+    stroke-dashoffset: var(--dash-len);
+  }
+  to {
+    stroke-dashoffset: var(--dash-to);
+  }
+}
+.donut-seg {
+  animation: donut-draw 1s var(--meridian-ease) both;
+  transition: stroke-width 0.32s var(--meridian-ease), opacity 0.32s var(--meridian-ease);
+}
+@keyframes count-pop {
+  from {
+    transform: translateY(6px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+.count-pop {
+  animation: count-pop 0.3s var(--meridian-ease) both;
+}
+
+@keyframes toast-in {
+  from {
+    transform: translateY(20px) scale(0.96);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+.toast-in {
+  animation: toast-in 0.4s var(--meridian-ease) both;
+}
+
+/* ---- Focus ring (a11y) ---- */
+.focus-ring:focus-visible {
+  outline: 2px solid #111318;
+  outline-offset: 2px;
+}
+
+/* ---- Scrollbars: hide until scroll ---- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 9999px;
+}
+*:hover::-webkit-scrollbar-thumb {
+  background: rgba(28, 25, 23, 0.16);
+}

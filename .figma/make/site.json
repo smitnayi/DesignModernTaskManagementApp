@@ -1,0 +1,10 @@
+{
+  "description": "Experience a modern task management software designed for teams seeking an intuitive and visually appealing alternative to traditional tools like Notion and Jira.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
